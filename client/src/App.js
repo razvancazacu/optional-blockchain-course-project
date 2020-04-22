@@ -25,7 +25,7 @@ class App extends Component {
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = MyContract.networks[networkId];
-      var deployed_smart_contract_address = "0x62b000745664c2fF108D9E418c24f86C6218d396"
+      var deployed_smart_contract_address = "0x36D21007733eD886CAdBA43d73Ac67B7967B6399"
       const instance = new web3.eth.Contract(
         MyContract.abi,
         deployedNetwork && deployedNetwork.address,

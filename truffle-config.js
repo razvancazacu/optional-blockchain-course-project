@@ -17,10 +17,9 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
-var path = require('path')
-
-// require('dotenv').config()  // dotenv package
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+path = require('path');
+require('./client/node_modules/dotenv').config()  // dotenv package
+const HDWalletProvider = require('./client/node_modules/@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
@@ -76,8 +75,8 @@ module.exports = {
     },
     kovan: {
       provider: () => new HDWalletProvider(
-                      "abstract dog hint want whisper rely guard control catalog intact poverty siege",
-                      "https://kovan.infura.io/v3/85cb02461a614979908035151837a2a6"
+                      process.env.MNEMONIC,
+                      process.env.KOVAN_URL
                       ),
       gas: 5000000,
       gasPrice: 25000000000,
