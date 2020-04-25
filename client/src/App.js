@@ -121,9 +121,8 @@ class App extends Component {
     return (
       <div className="App"> 
       <p>Claims: {this.state.claimsNumber}</p>
-      <div>Your account: {this.state.account}</div>
         
-          <table className="table-table-dark">
+          <table className="ui celled table">
             <thead>
               <tr>
                 <th scope="col">Issuer</th>
@@ -142,18 +141,20 @@ class App extends Component {
               ))}
             </tbody>
           </table>
+          <a class="ui tag label">Your account: {this.state.account}</a>
 
-          <form className="form-group" onSubmit={this.handleSubmit}>
-              <label>
-                Owner: 
-              </label>
-                <input type="text" value={this.state.ownerField } onChange={this.handleChangeO} />
-              <label>
-                Data: 
-              </label>
-                <input type="text"  value={this.state.dataField } onChange={this.handleChangeD} />
-              <button type="submit" className="ui button" value="Submit">Send</button>
+        <form className="ui form"  onSubmit={this.handleSubmit}>
+          <div className="field">
+            <label>Owner: </label>
+            <input type="text" name="first-name" value={this.state.ownerField } onChange={this.handleChangeO} placeholder="...owner"/>
+          </div>
+          <div className="field">
+            <label>Data: </label>
+            <input type="text" name="last-name" value={this.state.dataField } onChange={this.handleChangeD} placeholder="...data"/>
+          </div>
+          <button type="submit" className="ui button" value="Submit">Submit</button>
         </form>
+        
       </div>
     );
   }
