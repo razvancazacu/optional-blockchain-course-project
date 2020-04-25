@@ -75,8 +75,8 @@ module.exports = {
     },
     kovan: {
       provider: () => new HDWalletProvider(
-                      process.env.MNEMONIC,
-                      process.env.KOVAN_URL
+        "abstract dog hint want whisper rely guard control catalog intact poverty siege",
+                      "https://kovan.infura.io/v3/85cb02461a614979908035151837a2a6"
                       ),
       gas: 5000000,
       gasPrice: 25000000000,
