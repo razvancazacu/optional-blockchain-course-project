@@ -41,7 +41,7 @@ class App extends Component {
 
 
       
-      var deployed_smart_contract_address = "0x7f2F605FD70f8Fc9445d34844fa90FE7c2C42cA6"
+      var deployed_smart_contract_address = "0x943d15F59f121A8BC67faDFD2b0fD4083954ca45"
       const instance = new web3.eth.Contract(
         ClaimContainer.abi,
         deployedNetwork && deployedNetwork.address,
@@ -58,14 +58,40 @@ class App extends Component {
         _claims.push(claim);
     }
       this.setState({claims: _claims,claimsNumber: _claimsNumber});
-      instance.methods.getClaimOwnedNumber().call().then(
-        console.log);
+
+
+
+      //   web3.eth.sendTransaction({
+      //     from: accounts[0],
+      //     data: "1000" // deploying a contracrt
+      // }, function(error, hash){
+      //     console.log("error");
+      // });
+
       // instance.methods.getClaim(1).call().then(
       //   console.log);
 
-      // instance.methods.addClaimToOwned(1).call().then(
+      // instance.addClaimToOwned.sendTransaction(accounts[1]).then(
       //   console.log);
       
+
+      // This Worked
+      // await instance.methods.addClaimToOwned(1,accounts[0]).send({from: accounts[0]}).then(
+      //   console.log);
+
+      // instance.methods.getClaimOwned(1).call().then(
+      //   console.log);
+      // https://github.com/MetaMask/metamask-extension/issues/3094
+      instance.methods.get().call().then(
+        console.log);
+  
+      // await instance.methods.getClaimOwnedNumber().call().then(
+      //   console.log);      
+        // await instance.methods.getClaimOwnedWithAddress(1,accounts[0]).call().then(
+        //   console.log); 
+      // await instance.methods.claimCount().call().then(
+      //   console.log);
+
       // const ownedClaimsNumber = await instance.methods.get().call();
       // this.setState({ ownedClaimsNumber })
       
@@ -141,7 +167,7 @@ class App extends Component {
               ))}
             </tbody>
           </table>
-          <a class="ui tag label">Your account: {this.state.account}</a>
+          <a className="ui tag label">Your account: {this.state.account}</a>
 
         <form className="ui form"  onSubmit={this.handleSubmit}>
           <div className="field">
