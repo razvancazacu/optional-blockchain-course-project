@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ClaimContainer from "./build/ClaimContainer.json";
 import getWeb3 from "./getWeb3";
-
+// import { Button, Confirm} from 'semantic-ui-react'
 import "./App.css";
 
 class App extends Component {
@@ -22,7 +22,9 @@ class App extends Component {
       addedClaim: false,
       ownedClaimsNumber: 0,
       ownerField: "",
-      dataField: ""
+      dataField: "",
+      confirmation: false,
+      claimToAddId: 0
     };
     
     this.handleChangeO = this.handleChangeO.bind(this);
@@ -42,7 +44,7 @@ class App extends Component {
 
 
       
-      var deployed_smart_contract_address = "0xc30264A7c8703935EC767Ab9a7b6a71eE89144F3"
+      var deployed_smart_contract_address = "0x2F0A0B85dE5652A3bFfaDE5794C5C389C904c0A2"
       const instance = new web3.eth.Contract(
         ClaimContainer.abi,
         deployedNetwork && deployedNetwork.address,
@@ -54,7 +56,7 @@ class App extends Component {
       var _claims = [];
       for (var i = 0; i < _claimsNumber; i++) {
         const claim = await instance.methods.getClaim(i).call();
-        _claims.push(claim);
+        _claims.push({...claim,id: i});
       }
       this.setState({claims: _claims,claimsNumber: _claimsNumber});
 
@@ -63,7 +65,7 @@ class App extends Component {
       var _ownedClaims = [];
       for (var i = 0; i < _ownedClaimsNumber; i++) {
         const claim = await instance.methods.getOwnedClaim(i,accounts[0]).call();
-        _ownedClaims.push(claim);
+        _ownedClaims.push({...claim,id: i});
       }
       this.setState({ownedClaims: _ownedClaims,ownedClaimsNumber: _ownedClaimsNumber});
       instance.options.address = deployed_smart_contract_address;
@@ -127,7 +129,22 @@ class App extends Component {
           ownedClaims: [...this.state.claims, claim]
         })
   };
+  confirm = () => this.setState({ confirmation: true })
+  decline = () => this.setState({ confirmation: false })
 
+  addClaim = async () => {
+    const {claimToAddId,contract,account } = this.state;
+    console.log(claimToAddId);
+    console.log(account);
+    await contract.methods.addOwnedClaim(claimToAddId,account).send({from: account}).then(console.log("added claim"));
+    this.setState({confirmation: true});
+  }
+  fetchClaim = id => {
+    this.setState({confirmation: false, claimToAddId: id});
+    console.log('Adding claim'); 
+    this.addClaim();
+  }
+  
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -135,28 +152,34 @@ class App extends Component {
     return (
       <div className="Application"> 
    
-   <div className="App"><a className="ui tag label">Your account: {this.state.account}</a></div>
-      <table class="ui selectable inverted table">
+   <div className="ui raised segment">
+      <a className="ui red ribbon label">Your account: {this.state.account}</a>  
+      <a className="ui red tag label">Owned Claims: {this.state.ownedClaimsNumber}</a>
+      <table className="ui selectable inverted table">
         <thead>
           <tr>
             <th>Issuer</th>
-            <th class="right aligned">Issuer Name</th>
-            <th class="right aligned">Data</th>
+            <th className="right aligned">Issuer Name</th>
+            <th className="right aligned">Data</th>
           </tr>
         </thead>
         <tbody>
         {this.state.ownedClaims.map((claim) => (
-            <tr key={Math.random()}>
+            <tr key={claim.id} >
                 <td >{claim._issuer}</td>
-                <td class="right aligned"> {claim._ownerName}</td>
-                <td class="right aligned">{claim._data}</td>
+                <td className="right aligned"> {claim._ownerName}</td>
+                <td className="right aligned">{claim._data}</td>
 
             </tr>
               ))}
         </tbody>
-      <a class="ui red tag label">Owned Claims: {this.state.claimsNumber}</a>
-
       </table>
+      </div>
+
+
+      
+      <div className="ui raised segment">
+      <a className="ui red tag label">Available Claims: {this.state.claimsNumber} ----- Pressing on any claims will begin a transaction for adding them</a>
           <table className="ui selectable celled table">
             <thead>
               <tr>
@@ -165,22 +188,19 @@ class App extends Component {
                 <th scope="col">Data </th>
               </tr>
             </thead>
-            <tbody>
             {this.state.claims.map((claim) => (
-            <tr key={Math.random()}>
+            <tbody key={claim.id} value={claim.id} onClick={() => this.fetchClaim(claim.id)}>
+            <tr >
                 <td>{claim._issuer}</td>
                 <td> {claim._ownerName}</td>
                 <td>{claim._data}</td>
-
             </tr>
-              ))}
             </tbody>
-      <div class="ui label">
-        <i class="mail icon"></i> Available Claims: {this.state.claimsNumber}
-      </div>
+            ))}
           </table>    
-        <div class="ui raised segment">
-          <a class="ui red ribbon label">Add your own claims</a> 
+        </div>
+        <div className="ui raised segment">
+          <a className="ui red ribbon label">Add your own claims</a> 
         <form className="ui form"  onSubmit={this.handleSubmit}>
           <div className="field">
             <label>Owner: </label>
