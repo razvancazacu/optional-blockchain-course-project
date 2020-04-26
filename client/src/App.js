@@ -11,6 +11,7 @@ class App extends Component {
    
     this.state = {
       account: 0,
+      testIndex: 0,
       claimRequestNumber: 0,
       claims: [],
       claimsNumber: 0,
@@ -41,7 +42,7 @@ class App extends Component {
 
 
       
-      var deployed_smart_contract_address = "0x943d15F59f121A8BC67faDFD2b0fD4083954ca45"
+      var deployed_smart_contract_address = "0x0e6a220991A1a33e52EC29925b369Acc39954B38"
       const instance = new web3.eth.Contract(
         ClaimContainer.abi,
         deployedNetwork && deployedNetwork.address,
@@ -59,7 +60,9 @@ class App extends Component {
     }
       this.setState({claims: _claims,claimsNumber: _claimsNumber});
 
-
+      instance.options.address = deployed_smart_contract_address;
+      this.setState({account: accounts[0], web3, accounts, contract: instance }, this.runExample);
+      console.log(this.state.claims);
 
       //   web3.eth.sendTransaction({
       //     from: accounts[0],
@@ -79,14 +82,19 @@ class App extends Component {
       // await instance.methods.addClaimToOwned(1,accounts[0]).send({from: accounts[0]}).then(
       //   console.log);
 
-      // instance.methods.getClaimOwned(1).call().then(
-      //   console.log);
-      // https://github.com/MetaMask/metamask-extension/issues/3094
-      instance.methods.get().call().then(
-        console.log);
-  
-      // await instance.methods.getClaimOwnedNumber().call().then(
+      // await instance.methods.getClaimOwned(1).call().then(
       //   console.log);      
+
+    
+      // https://github.com/MetaMask/metamask-extension/issues/3094
+      // instance.methods.get().call().then(
+      //   console.log);
+  //   instance.methods.fill_map(
+  //     {issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Users" },
+  //     {issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Windows 10" }
+  // ).call();
+      // await instance.methods.getClaimOwnedNumber().call().then(
+        // console.log);      
         // await instance.methods.getClaimOwnedWithAddress(1,accounts[0]).call().then(
         //   console.log); 
       // await instance.methods.claimCount().call().then(
@@ -103,15 +111,51 @@ class App extends Component {
       //     ownedClaims: [...this.state.ownedClaims, ownedClaim]
       //   })
       // }
-      instance.options.address = deployed_smart_contract_address
-      this.setState({account: accounts[0], web3, accounts, contract: instance }, this.runExample);
-      console.log(this.state.claims);
+      // this.setState({testIndex: 0})
+      // const {testIndex} = this.state;
+      // console.log("Data added from contract");
+      // await instance.methods.returnTest_ConstrValues(testIndex).call().then(
+      //   console.log);
+      
+      // console.log("Calling function to add to owned claims - msg.sender some hard coded data");
+      // await instance.methods.addTest_values2().send({from: this.state.account}).then(
+      //   console.log);
 
+
+      // await instance.methods.addToTestingAdding().call().then(
+      // console.log);
+      // await instance.methods.getMsgSender().call().then(
+      // console.log);
+
+
+      // await instance.methods.returnTestMsgSender().call().then(
+      //   console.log);
+
+
+      
+      await instance.methods.getClaim(1).call().then(
+        console.log);
+      // -------------------------- hard coded
+      // pentru valoare out of bounds -> VM ERROR
+      await instance.methods.returnTest_ConstrValues(0).call().then(console.log);
+      await instance.methods.addToTestingAdding().call().then(console.log);
+
+      // -------------------------- hard coded
+      // await instance.methods.fill_map().call().then(console.log);
+      // await instance.methods.addTest_values().call().then(console.log);  // DIES -> possible out of bounds ? VM EXCEPTION
+
+      // -------------------------- using address accounts
+      await instance.methods.addTest_values(accounts[0]).call().then(console.log); // worked
+      await instance.methods.addTest_values2(accounts[0]).send({from: accounts[0]}).then(console.log); // worked
+      await instance.methods.getMsgSender(accounts[0]).call().then(console.log); // worked
+      await instance.methods.returnTestMsgSender(accounts[0]).call().then(console.log); // worked
+      await instance.methods.get(accounts[0]).call().then(console.log); // worked
+      
 
     } catch (error) {
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
+      // alert(
+      //   `Failed to load web3, accounts, or contract. Check console for details.`,
+      // );
       console.error(error);
     }
   };
