@@ -42,7 +42,7 @@ class App extends Component {
 
 
       
-      var deployed_smart_contract_address = "0x0e6a220991A1a33e52EC29925b369Acc39954B38"
+      var deployed_smart_contract_address = "0xc30264A7c8703935EC767Ab9a7b6a71eE89144F3"
       const instance = new web3.eth.Contract(
         ClaimContainer.abi,
         deployedNetwork && deployedNetwork.address,
@@ -51,107 +51,51 @@ class App extends Component {
 
 
       const _claimsNumber = await instance.methods.claimCount().call();
-      // this.setState({ claimsNumber })
       var _claims = [];
-      for (var i = 1; i <= _claimsNumber; i++) {
-      const claim = await instance.methods.getClaim(i).call();
-        // _claims: [...this.state.claims, claim];
+      for (var i = 0; i < _claimsNumber; i++) {
+        const claim = await instance.methods.getClaim(i).call();
         _claims.push(claim);
-    }
+      }
       this.setState({claims: _claims,claimsNumber: _claimsNumber});
 
+
+      const _ownedClaimsNumber = await instance.methods.getClaimOwnedNumberLength(accounts[0]).call();
+      var _ownedClaims = [];
+      for (var i = 0; i < _ownedClaimsNumber; i++) {
+        const claim = await instance.methods.getOwnedClaim(i,accounts[0]).call();
+        _ownedClaims.push(claim);
+      }
+      this.setState({ownedClaims: _ownedClaims,ownedClaimsNumber: _ownedClaimsNumber});
       instance.options.address = deployed_smart_contract_address;
       this.setState({account: accounts[0], web3, accounts, contract: instance }, this.runExample);
       console.log(this.state.claims);
-
-      //   web3.eth.sendTransaction({
-      //     from: accounts[0],
-      //     data: "1000" // deploying a contracrt
-      // }, function(error, hash){
-      //     console.log("error");
-      // });
-
-      // instance.methods.getClaim(1).call().then(
-      //   console.log);
-
-      // instance.addClaimToOwned.sendTransaction(accounts[1]).then(
-      //   console.log);
-      
-
-      // This Worked
-      // await instance.methods.addClaimToOwned(1,accounts[0]).send({from: accounts[0]}).then(
-      //   console.log);
-
-      // await instance.methods.getClaimOwned(1).call().then(
-      //   console.log);      
-
-    
-      // https://github.com/MetaMask/metamask-extension/issues/3094
-      // instance.methods.get().call().then(
-      //   console.log);
-  //   instance.methods.fill_map(
-  //     {issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Users" },
-  //     {issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Windows 10" }
-  // ).call();
-      // await instance.methods.getClaimOwnedNumber().call().then(
-        // console.log);      
-        // await instance.methods.getClaimOwnedWithAddress(1,accounts[0]).call().then(
-        //   console.log); 
-      // await instance.methods.claimCount().call().then(
-      //   console.log);
-
-      // const ownedClaimsNumber = await instance.methods.get().call();
-      // this.setState({ ownedClaimsNumber })
-      
-      // console.log(instance.methods.ownedClaims(accounts[0]));
-      // console.log(instance.methods.claims(1));
-      // for (var i = 1; i <= ownedClaimsNumber; i++) {
-      // const ownedClaim = await instance.methods.getOwnedClaim(i).call();
-      //   this.setState({
-      //     ownedClaims: [...this.state.ownedClaims, ownedClaim]
-      //   })
-      // }
-      // this.setState({testIndex: 0})
-      // const {testIndex} = this.state;
-      // console.log("Data added from contract");
-      // await instance.methods.returnTest_ConstrValues(testIndex).call().then(
-      //   console.log);
-      
-      // console.log("Calling function to add to owned claims - msg.sender some hard coded data");
-      // await instance.methods.addTest_values2().send({from: this.state.account}).then(
-      //   console.log);
-
-
-      // await instance.methods.addToTestingAdding().call().then(
-      // console.log);
-      // await instance.methods.getMsgSender().call().then(
-      // console.log);
-
-
-      // await instance.methods.returnTestMsgSender().call().then(
-      //   console.log);
-
-
+      console.log(this.state.ownedClaims);
       
       await instance.methods.getClaim(1).call().then(
         console.log);
       // -------------------------- hard coded
       // pentru valoare out of bounds -> VM ERROR
-      await instance.methods.returnTest_ConstrValues(0).call().then(console.log);
-      await instance.methods.addToTestingAdding().call().then(console.log);
+      // await instance.methods.returnTest_ConstrValues(0).call().then(console.log);
+      // await instance.methods.addToTestingAdding().call().then(console.log);
 
       // -------------------------- hard coded
       // await instance.methods.fill_map().call().then(console.log);
       // await instance.methods.addTest_values().call().then(console.log);  // DIES -> possible out of bounds ? VM EXCEPTION
 
       // -------------------------- using address accounts
-      await instance.methods.addTest_values(accounts[0]).call().then(console.log); // worked
-      await instance.methods.addTest_values2(accounts[0]).send({from: accounts[0]}).then(console.log); // worked
-      await instance.methods.getMsgSender(accounts[0]).call().then(console.log); // worked
-      await instance.methods.returnTestMsgSender(accounts[0]).call().then(console.log); // worked
-      await instance.methods.get(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.addTest_values(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.addOwnedClaim(0,accounts[0]).send({from: accounts[0]}).then(console.log); // worked
+      await instance.methods.addTest_values2(accounts[0]).call().then(console.log); // worked
+      await instance.methods.getMsgSender(accounts[0]).call().then(console.log); // worked 
+      // await instance.methods.addOwnedClaim(0,accounts[0]).call().then(console.log("added claim"));
       
-
+      await instance.methods.getClaimOwnedNumberLength(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getClaimOwnedNumber(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getOwnedClaim(0,accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getOwnedClaim(1,accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getOwned0Value(accounts[0]).call().then(console.log); // worked
+      
+      
     } catch (error) {
       // alert(
       //   `Failed to load web3, accounts, or contract. Check console for details.`,
@@ -189,14 +133,35 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
-      <div className="App"> 
-      <p>Claims: {this.state.claimsNumber}</p>
-        
-          <table className="ui celled table">
+      <div className="Application"> 
+   
+   <div className="App"><a className="ui tag label">Your account: {this.state.account}</a></div>
+      <table class="ui selectable inverted table">
+        <thead>
+          <tr>
+            <th>Issuer</th>
+            <th class="right aligned">Issuer Name</th>
+            <th class="right aligned">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+        {this.state.ownedClaims.map((claim) => (
+            <tr key={Math.random()}>
+                <td >{claim._issuer}</td>
+                <td class="right aligned"> {claim._ownerName}</td>
+                <td class="right aligned">{claim._data}</td>
+
+            </tr>
+              ))}
+        </tbody>
+      <a class="ui red tag label">Owned Claims: {this.state.claimsNumber}</a>
+
+      </table>
+          <table className="ui selectable celled table">
             <thead>
               <tr>
                 <th scope="col">Issuer</th>
-                <th scope="col">Owner</th>
+                <th scope="col">Issuer Name</th>
                 <th scope="col">Data </th>
               </tr>
             </thead>
@@ -210,9 +175,12 @@ class App extends Component {
             </tr>
               ))}
             </tbody>
-          </table>
-          <a className="ui tag label">Your account: {this.state.account}</a>
-
+      <div class="ui label">
+        <i class="mail icon"></i> Available Claims: {this.state.claimsNumber}
+      </div>
+          </table>    
+        <div class="ui raised segment">
+          <a class="ui red ribbon label">Add your own claims</a> 
         <form className="ui form"  onSubmit={this.handleSubmit}>
           <div className="field">
             <label>Owner: </label>
@@ -225,6 +193,7 @@ class App extends Component {
           <button type="submit" className="ui button" value="Submit">Submit</button>
         </form>
         
+        </div>
       </div>
     );
   }

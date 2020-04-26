@@ -7,7 +7,6 @@ contract ClaimContainer {
 
     mapping (address => Claim[]) ownedClaims;
     mapping (address => uint256) public numberOfOwned;
-    mapping (address => ClaimO) public testOwned;
     event ClaimRequested(address _sender,address _issuer);
     event ClaimAdded(address _issuer, string _ownerName, string _data);
     address public test_adding;
@@ -78,21 +77,19 @@ contract ClaimContainer {
     function getMsgSender() public view returns (address _me){
         return msg.sender;
     }
-     function returnTestMsgSender() public view
-        returns( string memory _ownerNameR, string memory _dataR, address _issuer) {
-            return (
-                ownedClaims[msg.sender][0].ownerName,
-                ownedClaims[msg.sender][0].data,
-                ownedClaims[msg.sender][0].issuer
-            );
-        }
-
 
     function get()  public view returns(string memory _ownerName) {
         return ownedClaims[msg.sender][1].ownerName;
     }
 
 // --------------------------------------------------- TESTING WITH ADDRESS GIVEN ADDRESS
+    // returns how many claim the owner has
+    function getClaimOwnedNumber(address owner) public view returns(uint256 _nrOwned){
+        return numberOfOwned[owner];
+    }
+     function getClaimOwnedNumberLength(address owner) public view returns(uint256 _nrOwned){
+        return ownedClaims[owner].length;
+    }
     function fill_map(address test_add) public  {
         ownedClaims[test_add].push(Claim({issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Teams" }));
         ownedClaims[test_add].push(Claim({issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Windows 8.1" }));
@@ -112,61 +109,18 @@ contract ClaimContainer {
             data: "TestVal"})
              );
     }
-
-    function getMsgSender(address test_add) public pure returns (address _me){
-        return test_add;
-    }
-     function returnTestMsgSender(address test_add) public view
-        returns( string memory _ownerNameR, string memory _dataR, address _issuer) {
-            return (
-                ownedClaims[test_add][0].ownerName,
-                ownedClaims[test_add][0].data,
-                ownedClaims[test_add][0].issuer
-            );
-        }
-
-
-    function get(address test_add)  public view returns(string memory _ownerName) {
-        return ownedClaims[test_add][1].ownerName;
+    function addOwnedClaim(uint256 claimRequestedId, address owAddress) public{
+        address payable _is = claims[claimRequestedId].issuer;
+        string memory _owner = claims[claimRequestedId].ownerName;
+        string memory _data = claims[claimRequestedId].data;
+        ownedClaims[owAddress].push(Claim({
+            issuer: _is,
+            ownerName: _owner,
+            data: _data})
+             );
     }
 
-
-    struct Claim {
-        address payable issuer;
-        string ownerName;
-        string data;
-    }
-        struct ClaimO {
-          mapping (uint256 => Claim) _claims;
-          uint256 nrClaims;
-    }
-    function addClaim(string memory _ownerName, string memory _data) public
-        returns( string memory _ownerNameR, string memory _dataR, address _issuer) {
-
-        uint256 claimId = claimCount + 1;
-        claims[claimId].issuer = msg.sender;
-        claims[claimId].ownerName = _ownerName;
-        claims[claimId].data = _data;
-
-        emit ClaimAdded(
-            msg.sender,
-            _ownerName,
-            _data
-        );
-
-        claimCount++;
-        return (
-            claims[claimId].ownerName,
-            claims[claimId].data,
-            claims[claimId].issuer
-        );
-    }
-    // returns how many claim the owner has
-    function getClaimOwnedNumber() public view returns(uint256 _nrOwned){
-        address payable self = msg.sender;
-        return numberOfOwned[self];
-    }
-  function getClaimOwnedWithAddress(uint256 _claimOwnedId,address addr0) //Not working
+  function getOwnedClaim(uint256 _claimOwnedId,address addr0) //Not working
         public
         view
         returns(
@@ -181,19 +135,41 @@ contract ClaimContainer {
             ownedClaims[addr0][_claimOwnedId].data
         );
     }
-    function getClaimOwned(uint256 _claimOwnedId) //Not working
-        public
-        view
-        returns(
-            address _issuer,
-            string memory _ownerName,
-            string memory _data
-        )
-    {
+    function getMsgSender(address test_add) public pure returns (address _me){
+        return test_add;
+    }
+     function getOwned0Value(address test_add) public view
+        returns( string memory _ownerNameR, string memory _dataR, address _issuer) {
+            return (
+                ownedClaims[test_add][0].ownerName,
+                ownedClaims[test_add][0].data,
+                ownedClaims[test_add][0].issuer
+            );
+        }
+
+
+    struct Claim {
+        address payable issuer;
+        string ownerName;
+        string data;
+    }
+     function addClaim(string memory _ownerName, string memory _data) public
+        returns( string memory _ownerNameR, string memory _dataR, address _issuer) {
+        uint256 claimId = claimCount;
+        claims[claimId].issuer = msg.sender;
+        claims[claimId].ownerName = _ownerName;
+        claims[claimId].data = _data;
+
+        emit ClaimAdded(
+            msg.sender,
+            _ownerName,
+            _data
+        );
+        claimCount++;
         return (
-            ownedClaims[msg.sender][_claimOwnedId].issuer,
-            ownedClaims[msg.sender][_claimOwnedId].ownerName,
-            ownedClaims[msg.sender][_claimOwnedId].data
+            claims[claimId].ownerName,
+            claims[claimId].data,
+            claims[claimId].issuer
         );
     }
     function getClaim(uint256 _claimId)
