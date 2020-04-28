@@ -199,8 +199,8 @@ class App extends Component {
             <thead>
               <tr>
                 <th scope="col">Issuer</th>
-                <th scope="col">Issuer Name</th>
-                <th scope="col">Data </th>
+                <th className="right aligned" scope="col">Issuer Name</th>
+                <th className="right aligned" scope="col">Data </th>
               </tr>
             </thead>
             {this.state.claims.map((claim) => (

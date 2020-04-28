@@ -53,34 +53,6 @@ contract ClaimContainer {
             data: "TestVal"})
              );
     }
-// --------------------------------------------------- TESTING WITH ADDRESS MSG.SENDER THIS DOESNT WORK!!!
-    function fill_map() public  {
-        ownedClaims[msg.sender].push(Claim({issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Teams" }));
-        ownedClaims[msg.sender].push(Claim({issuer:0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA,ownerName: "Microsoft",data:"Windows 8.1" }));
-        numberOfOwned[msg.sender] ++;
-  }
-    function addTest_values() public{  //not working
-        ownedClaims[msg.sender][0].ownerName = "TestVal";
-        ownedClaims[msg.sender][0].data = "TestVal";
-        address payable _is = 0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA;
-        ownedClaims[msg.sender][0].issuer = _is;
-    }
-     function addTest_values2() public{
-        address payable _is = 0xb2341897B1CE81aC2C7553cE841d7efd2767e9EA;
-        ownedClaims[msg.sender].push(Claim({
-            issuer: _is,
-            ownerName: "TestVal",
-            data: "TestVal"})
-             );
-    }
-
-    function getMsgSender() public view returns (address _me){
-        return msg.sender;
-    }
-
-    function get()  public view returns(string memory _ownerName) {
-        return ownedClaims[msg.sender][1].ownerName;
-    }
 
 // --------------------------------------------------- TESTING WITH ADDRESS GIVEN ADDRESS
     // returns how many claim the owner has
@@ -172,6 +144,17 @@ contract ClaimContainer {
             claims[claimId].issuer
         );
     }
+    function isDuplicateClaim(string memory _ownerName, string memory _data, address issuer) public view returns( bool isDuplicate ){
+        for(uint256 i = 0; i < claimCount; i++){
+            Claim memory claim = claims[i];
+            if( issuer == claim.issuer &&
+                keccak256(abi.encodePacked(_ownerName)) == keccak256(abi.encodePacked(claim.ownerName)) &&
+                keccak256(abi.encodePacked(_data)) == keccak256(abi.encodePacked(claim.data))){
+                return true;
+            }
+        }
+        return false;
+    }
     function getClaim(uint256 _claimId)
             public
             view
@@ -188,4 +171,16 @@ contract ClaimContainer {
             );
         }
 
+    function isDuplicateOwnedClaim(uint256 _claimId, address _owner) public view returns( bool isDuplicate ){
+        Claim memory claim = claims[_claimId];
+        for(uint256 i = 0; i < ownedClaims[_owner].length; i++){
+            Claim memory oClaim = ownedClaims[_owner][i];
+            if( oClaim.issuer == claim.issuer &&
+                keccak256(abi.encodePacked(oClaim.ownerName)) == keccak256(abi.encodePacked(claim.ownerName)) &&
+                keccak256(abi.encodePacked(oClaim.data)) == keccak256(abi.encodePacked(claim.data))){
+                return true;
+            }
+        }
+        return false;
+    }
 }
