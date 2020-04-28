@@ -44,7 +44,7 @@ class App extends Component {
 
 
       
-      var deployed_smart_contract_address = "0x2F0A0B85dE5652A3bFfaDE5794C5C389C904c0A2"
+      var deployed_smart_contract_address = "0x854EC08BBAd607A30015eB5Bc40542dC8724da8E"
       const instance = new web3.eth.Contract(
         ClaimContainer.abi,
         deployedNetwork && deployedNetwork.address,
@@ -70,11 +70,11 @@ class App extends Component {
       this.setState({ownedClaims: _ownedClaims,ownedClaimsNumber: _ownedClaimsNumber});
       instance.options.address = deployed_smart_contract_address;
       this.setState({account: accounts[0], web3, accounts, contract: instance }, this.runExample);
-      console.log(this.state.claims);
-      console.log(this.state.ownedClaims);
+      // console.log(this.state.claims);
+      // console.log(this.state.ownedClaims);
       
-      await instance.methods.getClaim(1).call().then(
-        console.log);
+      // await instance.methods.getClaim(1).call().then(
+      //   console.log);
       // -------------------------- hard coded
       // pentru valoare out of bounds -> VM ERROR
       // await instance.methods.returnTest_ConstrValues(0).call().then(console.log);
@@ -87,11 +87,11 @@ class App extends Component {
       // -------------------------- using address accounts
       // await instance.methods.addTest_values(accounts[0]).call().then(console.log); // worked
       // await instance.methods.addOwnedClaim(0,accounts[0]).send({from: accounts[0]}).then(console.log); // worked
-      await instance.methods.addTest_values2(accounts[0]).call().then(console.log); // worked
-      await instance.methods.getMsgSender(accounts[0]).call().then(console.log); // worked 
+      // await instance.methods.addTest_values2(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getMsgSender(accounts[0]).call().then(console.log); // worked 
       // await instance.methods.addOwnedClaim(0,accounts[0]).call().then(console.log("added claim"));
       
-      await instance.methods.getClaimOwnedNumberLength(accounts[0]).call().then(console.log); // worked
+      // await instance.methods.getClaimOwnedNumberLength(accounts[0]).call().then(console.log); // worked
       // await instance.methods.getClaimOwnedNumber(accounts[0]).call().then(console.log); // worked
       // await instance.methods.getOwnedClaim(0,accounts[0]).call().then(console.log); // worked
       // await instance.methods.getOwnedClaim(1,accounts[0]).call().then(console.log); // worked
@@ -99,9 +99,9 @@ class App extends Component {
       
       
     } catch (error) {
-      // alert(
-      //   `Failed to load web3, accounts, or contract. Check console for details.`,
-      // );
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`,
+      );
       console.error(error);
     }
   };
@@ -123,25 +123,40 @@ class App extends Component {
   updateValue = async () => {
     const { accounts, contract, ownerField, dataField} = this.state;
     // await contract.methods.set(value).send({ from: accounts[0] });
-
-    const claim = await contract.methods.addClaim(ownerField, dataField).send({from: accounts[0]});
-    this.setState({
-          ownedClaims: [...this.state.claims, claim]
-        })
+    const isDuplicate = await contract.methods.isDuplicateClaim(ownerField, dataField, accounts[0]).call();
+    if(isDuplicate){
+      alert(
+        `The claim is already added`,
+      );
+    } else {
+      const claim = await contract.methods.addClaim(ownerField, dataField).send({from: accounts[0]});
+      this.setState({
+            ownedClaims: [...this.state.claims, claim]
+          })
+    }
   };
+    
   confirm = () => this.setState({ confirmation: true })
   decline = () => this.setState({ confirmation: false })
 
   addClaim = async () => {
     const {claimToAddId,contract,account } = this.state;
-    console.log(claimToAddId);
-    console.log(account);
-    await contract.methods.addOwnedClaim(claimToAddId,account).send({from: account}).then(console.log("added claim"));
-    this.setState({confirmation: true});
-  }
+    const isDuplicate = await contract.methods.isDuplicateOwnedClaim(claimToAddId, account).call();
+    const {_ownerName, _data, _issuer} = await contract.methods.getClaim(claimToAddId).call();
+    if(isDuplicate){
+      const alertMessage = "Claim\nOwner " + _ownerName + "\nData: " + _data + "\nIssuer:" + _issuer + "\Is already added. If this another claim was wanted, try again.";
+      alert(alertMessage);
+    } else {
+      const {_ownerName, _data, _issuer} = await contract.methods.getClaim(claimToAddId).call();
+      const alertMessage = "Transaction for claim \Ownned by " + _ownerName + "\nData " + _data + "\nIssuer address at " + _issuer + "\nHas been sent!";
+      alert(alertMessage);
+      await contract.methods.addOwnedClaim(claimToAddId,account).send({from: account}).then(console.log());
+      this.setState({confirmation: true});
+    }
+  };
+
   fetchClaim = id => {
     this.setState({confirmation: false, claimToAddId: id});
-    console.log('Adding claim'); 
     this.addClaim();
   }
   
